@@ -1,0 +1,19 @@
+{
+  "name": "gemini_flash_lite_only",
+  "purpose": "OpenRouter-only cheap/balanced first-pass models intended to test whether low-cost LLMs and open/open-ish models are similar to Jev on classification.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 100,
+  "status": "proposed_for_user_approval",
+  "models": [
+    {
+      "label": "gemini_flash_lite",
+      "adapter": "openrouter-letter",
+      "model": "google/gemini-3.5-flash-lite",
+      "provider_family": "Google",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.3,
+      "price_per_1m_output_usd": 2.5,
+      "reason": "Google low-latency/high-volume tier."
+    }
+  ]
+}

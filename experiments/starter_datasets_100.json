@@ -1,0 +1,42 @@
+{
+  "name": "starter_datasets_100",
+  "purpose": "Six real classification/MCQ datasets converted to the common JSONL option-letter format, 100 examples each.",
+  "models": [
+    {
+      "label": "sst2",
+      "path": "data/sst2_dev_100.jsonl",
+      "task_type": "sentiment",
+      "options": 2
+    },
+    {
+      "label": "ag_news",
+      "path": "data/ag_news_test_100.jsonl",
+      "task_type": "topic_classification",
+      "options": 4
+    },
+    {
+      "label": "trec",
+      "path": "data/trec_test_100.jsonl",
+      "task_type": "question_type_classification",
+      "options": 6
+    },
+    {
+      "label": "boolq",
+      "path": "data/boolq_val_100.jsonl",
+      "task_type": "boolean_reading_comprehension",
+      "options": 2
+    },
+    {
+      "label": "arc_challenge",
+      "path": "data/arc_challenge_dev_100.jsonl",
+      "task_type": "science_multiple_choice",
+      "options": "3-4"
+    },
+    {
+      "label": "20_newsgroups",
+      "path": "data/20_newsgroups_test_100.jsonl",
+      "task_type": "many_class_topic_classification",
+      "options": 20
+    }
+  ]
+}

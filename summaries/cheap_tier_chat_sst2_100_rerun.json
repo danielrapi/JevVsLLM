@@ -1,0 +1,494 @@
+[
+  {
+    "label": "openai_luna",
+    "adapter": "openrouter-letter",
+    "model": "openai/gpt-5.6-luna",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/openai_luna.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.89,
+      "errors": 6,
+      "invalid": 6,
+      "error_rate": 0.06,
+      "invalid_rate": 0.06,
+      "macro_precision": 0.9470108695652174,
+      "macro_recall": 0.946808510638298,
+      "macro_f1": 0.9468024900962082,
+      "weighted_precision": 0.9470108695652174,
+      "weighted_recall": 0.9468085106382979,
+      "weighted_f1": 0.9468024900962082,
+      "mean_latency_ms": 958.8801562706067,
+      "median_latency_ms": 875.0646465050522,
+      "p90_latency_ms": 1182.7760829910403,
+      "p95_latency_ms": 1496.7692499922123,
+      "p99_latency_ms": 2460.040249992744,
+      "total_cost_usd": 0.0,
+      "mean_cost_usd": 0.0,
+      "cost_per_1k_usd": 0.0,
+      "cost_per_correct_usd": 0.0,
+      "input_tokens": 7873,
+      "output_tokens": 566,
+      "mean_input_tokens": 78.73,
+      "mean_output_tokens": 5.66,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 47,
+          "true_positive": 45,
+          "false_positive": 3,
+          "false_negative": 2,
+          "precision": 0.9375,
+          "recall": 0.9574468085106383,
+          "f1": 0.9473684210526315
+        },
+        {
+          "label": "B",
+          "support": 47,
+          "true_positive": 44,
+          "false_positive": 2,
+          "false_negative": 3,
+          "precision": 0.9565217391304348,
+          "recall": 0.9361702127659575,
+          "f1": 0.9462365591397849
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 45,
+          "B": 2
+        },
+        "B": {
+          "A": 3,
+          "B": 44
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "claude_haiku",
+    "adapter": "openrouter-letter",
+    "model": "anthropic/claude-haiku-5.5",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/claude_haiku.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.9,
+      "errors": 8,
+      "invalid": 8,
+      "error_rate": 0.08,
+      "invalid_rate": 0.08,
+      "macro_precision": 0.98,
+      "macro_recall": 0.9772727272727273,
+      "macro_f1": 0.9781680113906028,
+      "weighted_precision": 0.9791304347826086,
+      "weighted_recall": 0.9782608695652174,
+      "weighted_f1": 0.9782299168403459,
+      "mean_latency_ms": 1215.2756854088511,
+      "median_latency_ms": 1156.4889999935986,
+      "p90_latency_ms": 1442.831791995559,
+      "p95_latency_ms": 1583.6542499891948,
+      "p99_latency_ms": 1799.5798750052927,
+      "total_cost_usd": 0.0013474999999999993,
+      "mean_cost_usd": 1.3475e-05,
+      "cost_per_1k_usd": 0.013474999999999994,
+      "cost_per_correct_usd": 1.4972222222222215e-05,
+      "input_tokens": 11775,
+      "output_tokens": 340,
+      "mean_input_tokens": 117.75,
+      "mean_output_tokens": 3.4,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 44,
+          "true_positive": 42,
+          "false_positive": 0,
+          "false_negative": 2,
+          "precision": 1.0,
+          "recall": 0.9545454545454546,
+          "f1": 0.9767441860465117
+        },
+        {
+          "label": "B",
+          "support": 48,
+          "true_positive": 48,
+          "false_positive": 2,
+          "false_negative": 0,
+          "precision": 0.96,
+          "recall": 1.0,
+          "f1": 0.9795918367346939
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 42,
+          "B": 2
+        },
+        "B": {
+          "A": 0,
+          "B": 48
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "gemini_flash_lite",
+    "adapter": "openrouter-letter",
+    "model": "google/gemini-3.5-flash-lite",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/gemini_flash_lite.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.92,
+      "errors": 4,
+      "invalid": 4,
+      "error_rate": 0.04,
+      "invalid_rate": 0.04,
+      "macro_precision": 0.9583333333333333,
+      "macro_recall": 0.9591304347826086,
+      "macro_f1": 0.9583152409900131,
+      "weighted_precision": 0.9592013888888888,
+      "weighted_recall": 0.9583333333333334,
+      "weighted_f1": 0.9583514256766535,
+      "mean_latency_ms": 678.0486704299983,
+      "median_latency_ms": 651.1928334948607,
+      "p90_latency_ms": 806.3839999958873,
+      "p95_latency_ms": 947.8611670056125,
+      "p99_latency_ms": 1166.516833996866,
+      "total_cost_usd": 0.0024247000000000006,
+      "mean_cost_usd": 2.4247e-05,
+      "cost_per_1k_usd": 0.024247000000000008,
+      "cost_per_correct_usd": 2.63554347826087e-05,
+      "input_tokens": 7149,
+      "output_tokens": 112,
+      "mean_input_tokens": 71.49,
+      "mean_output_tokens": 1.12,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 46,
+          "true_positive": 45,
+          "false_positive": 3,
+          "false_negative": 1,
+          "precision": 0.9375,
+          "recall": 0.9782608695652174,
+          "f1": 0.9574468085106383
+        },
+        {
+          "label": "B",
+          "support": 50,
+          "true_positive": 47,
+          "false_positive": 1,
+          "false_negative": 3,
+          "precision": 0.9791666666666666,
+          "recall": 0.94,
+          "f1": 0.9591836734693877
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 45,
+          "B": 1
+        },
+        "B": {
+          "A": 3,
+          "B": 47
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "deepseek_flash_latest",
+    "adapter": "openrouter-letter",
+    "model": "~deepseek/deepseek-flash-latest",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/deepseek_flash_latest.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.0,
+      "errors": 100,
+      "invalid": 100,
+      "error_rate": 1.0,
+      "invalid_rate": 1.0,
+      "macro_precision": null,
+      "macro_recall": null,
+      "macro_f1": null,
+      "weighted_precision": null,
+      "weighted_recall": null,
+      "weighted_f1": null,
+      "mean_latency_ms": 529.9395262412145,
+      "median_latency_ms": 415.4880835048971,
+      "p90_latency_ms": 917.0205840055132,
+      "p95_latency_ms": 1189.8542920098407,
+      "p99_latency_ms": 1486.0574589984026,
+      "total_cost_usd": 0.001983899600000001,
+      "mean_cost_usd": 1.9838996e-05,
+      "cost_per_1k_usd": 0.01983899600000001,
+      "cost_per_correct_usd": null,
+      "input_tokens": 9900,
+      "output_tokens": 800,
+      "mean_input_tokens": 99,
+      "mean_output_tokens": 8,
+      "per_class": [],
+      "confusion_matrix": {},
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "qwen_flash",
+    "adapter": "openrouter-letter",
+    "model": "qwen/qwen3.7-flash",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/qwen_flash.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.0,
+      "errors": 100,
+      "invalid": 100,
+      "error_rate": 1.0,
+      "invalid_rate": 1.0,
+      "macro_precision": null,
+      "macro_recall": null,
+      "macro_f1": null,
+      "weighted_precision": null,
+      "weighted_recall": null,
+      "weighted_f1": null,
+      "mean_latency_ms": 885.1072979299352,
+      "median_latency_ms": 858.6329169993405,
+      "p90_latency_ms": 1078.949166010716,
+      "p95_latency_ms": 1216.8677919980837,
+      "p99_latency_ms": 1260.4921250022016,
+      "total_cost_usd": 0.00038897750000000016,
+      "mean_cost_usd": 3.889775e-06,
+      "cost_per_1k_usd": 0.003889775000000001,
+      "cost_per_correct_usd": null,
+      "input_tokens": 8605,
+      "output_tokens": 800,
+      "mean_input_tokens": 86.05,
+      "mean_output_tokens": 8,
+      "per_class": [],
+      "confusion_matrix": {},
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "llama_scout",
+    "adapter": "openrouter-letter",
+    "model": "meta-llama/llama-4-scout",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/llama_scout.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.98,
+      "errors": 0,
+      "invalid": 0,
+      "error_rate": 0.0,
+      "invalid_rate": 0.0,
+      "macro_precision": 0.9799679487179487,
+      "macro_recall": 0.9799679487179487,
+      "macro_f1": 0.9799679487179487,
+      "weighted_precision": 0.98,
+      "weighted_recall": 0.98,
+      "weighted_f1": 0.98,
+      "mean_latency_ms": 803.5189516097307,
+      "median_latency_ms": 713.851437503763,
+      "p90_latency_ms": 1217.0571660099085,
+      "p95_latency_ms": 1491.154874995118,
+      "p99_latency_ms": 1693.3363749994896,
+      "total_cost_usd": 0.0016424599999999999,
+      "mean_cost_usd": 1.64246e-05,
+      "cost_per_1k_usd": 0.016424599999999998,
+      "cost_per_correct_usd": 1.6759795918367346e-05,
+      "input_tokens": 8325,
+      "output_tokens": 244,
+      "mean_input_tokens": 83.25,
+      "mean_output_tokens": 2.44,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 48,
+          "true_positive": 47,
+          "false_positive": 1,
+          "false_negative": 1,
+          "precision": 0.9791666666666666,
+          "recall": 0.9791666666666666,
+          "f1": 0.9791666666666666
+        },
+        {
+          "label": "B",
+          "support": 52,
+          "true_positive": 51,
+          "false_positive": 1,
+          "false_negative": 1,
+          "precision": 0.9807692307692307,
+          "recall": 0.9807692307692307,
+          "f1": 0.9807692307692307
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 47,
+          "B": 1
+        },
+        "B": {
+          "A": 1,
+          "B": 51
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "mistral_small",
+    "adapter": "openrouter-letter",
+    "model": "mistralai/mistral-small-2603",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/mistral_small.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.56,
+      "errors": 39,
+      "invalid": 39,
+      "error_rate": 0.39,
+      "invalid_rate": 0.39,
+      "macro_precision": 0.9226579520697167,
+      "macro_recall": 0.9172043010752688,
+      "macro_f1": 0.9176788124156545,
+      "weighted_precision": 0.9219972141862208,
+      "weighted_recall": 0.9180327868852459,
+      "weighted_f1": 0.9177673060330523,
+      "mean_latency_ms": 3127.593748770887,
+      "median_latency_ms": 1214.300062500115,
+      "p90_latency_ms": 6070.303500004229,
+      "p95_latency_ms": 6342.423082998721,
+      "p99_latency_ms": 6610.508375000791,
+      "total_cost_usd": 0.00074187,
+      "mean_cost_usd": 1.2161803278688525e-05,
+      "cost_per_1k_usd": 0.0074187,
+      "cost_per_correct_usd": 1.3247678571428572e-05,
+      "input_tokens": 5221,
+      "output_tokens": 122,
+      "mean_input_tokens": 85.59016393442623,
+      "mean_output_tokens": 2,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 30,
+          "true_positive": 26,
+          "false_positive": 1,
+          "false_negative": 4,
+          "precision": 0.9629629629629629,
+          "recall": 0.8666666666666667,
+          "f1": 0.912280701754386
+        },
+        {
+          "label": "B",
+          "support": 31,
+          "true_positive": 30,
+          "false_positive": 4,
+          "false_negative": 1,
+          "precision": 0.8823529411764706,
+          "recall": 0.967741935483871,
+          "f1": 0.923076923076923
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 26,
+          "B": 4
+        },
+        "B": {
+          "A": 1,
+          "B": 30
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  },
+  {
+    "label": "kimi_k2_5",
+    "adapter": "openrouter-letter",
+    "model": "moonshotai/kimi-k2.5",
+    "run_path": "runs/cheap_tier_chat_sst2_100_rerun/kimi_k2_5.jsonl",
+    "summary": {
+      "adapter": "openrouter-letter",
+      "n": 100,
+      "accuracy": 0.3,
+      "errors": 68,
+      "invalid": 68,
+      "error_rate": 0.68,
+      "invalid_rate": 0.68,
+      "macro_precision": 0.9375,
+      "macro_recall": 0.9444444444444444,
+      "macro_f1": 0.9372549019607843,
+      "weighted_precision": 0.9453125,
+      "weighted_recall": 0.9375,
+      "weighted_f1": 0.9377450980392157,
+      "mean_latency_ms": 3829.52174585982,
+      "median_latency_ms": 898.295083497942,
+      "p90_latency_ms": 7372.43825000769,
+      "p95_latency_ms": 13980.503417013097,
+      "p99_latency_ms": 33821.89845800167,
+      "total_cost_usd": 0.02545130200000001,
+      "mean_cost_usd": 0.00025451302,
+      "cost_per_1k_usd": 0.2545130200000001,
+      "cost_per_correct_usd": 0.0008483767333333336,
+      "input_tokens": 8117,
+      "output_tokens": 8623,
+      "mean_input_tokens": 81.17,
+      "mean_output_tokens": 86.23,
+      "per_class": [
+        {
+          "label": "A",
+          "support": 14,
+          "true_positive": 14,
+          "false_positive": 2,
+          "false_negative": 0,
+          "precision": 0.875,
+          "recall": 1.0,
+          "f1": 0.9333333333333333
+        },
+        {
+          "label": "B",
+          "support": 18,
+          "true_positive": 16,
+          "false_positive": 0,
+          "false_negative": 2,
+          "precision": 1.0,
+          "recall": 0.8888888888888888,
+          "f1": 0.9411764705882353
+        }
+      ],
+      "confusion_matrix": {
+        "A": {
+          "A": 14,
+          "B": 0
+        },
+        "B": {
+          "A": 2,
+          "B": 16
+        }
+      },
+      "brier_score": null,
+      "ece": null,
+      "mean_confidence": null
+    }
+  }
+]

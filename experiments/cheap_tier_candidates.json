@@ -1,0 +1,89 @@
+{
+  "name": "cheap_tier_candidates",
+  "purpose": "OpenRouter-only cheap/balanced first-pass models intended to test whether low-cost LLMs and open/open-ish models are similar to Jev on classification.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 100,
+  "status": "proposed_for_user_approval",
+  "models": [
+    {
+      "label": "jev_openrouter",
+      "adapter": "jev-openrouter",
+      "model": "~typesafe/jev-latest",
+      "provider_family": "TypeSafe via OpenRouter",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0,
+      "reason": "Same decision-model family through OpenRouter to isolate gateway/latency effects."
+    },
+    {
+      "label": "openai_luna",
+      "adapter": "openrouter-letter",
+      "model": "openai/gpt-5.6-luna",
+      "provider_family": "OpenAI",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.20,
+      "price_per_1m_output_usd": 1.20,
+      "reason": "OpenAI cheap/high-volume tier through OpenRouter."
+    },
+    {
+      "label": "claude_haiku",
+      "adapter": "openrouter-letter",
+      "model": "anthropic/claude-haiku-5.5",
+      "provider_family": "Anthropic",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.10,
+      "price_per_1m_output_usd": 0.50,
+      "reason": "Anthropic low-cost/high-volume tier."
+    },
+    {
+      "label": "gemini_flash_lite",
+      "adapter": "openrouter-letter",
+      "model": "google/gemini-3.5-flash-lite",
+      "provider_family": "Google",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.30,
+      "price_per_1m_output_usd": 2.50,
+      "reason": "Google low-latency/high-volume tier."
+    },
+    {
+      "label": "deepseek_flash_latest",
+      "adapter": "openrouter-letter",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider_family": "DeepSeek",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.30,
+      "price_per_1m_output_usd": 1.20,
+      "reason": "Explicit DeepSeek V4.1 Flash route; reasoning disabled in the adapter made this reliable on SST-2."
+    },
+    {
+      "label": "qwen_flash",
+      "adapter": "openrouter-letter",
+      "model": "qwen/qwen3.7-flash",
+      "provider_family": "Qwen",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.03,
+      "price_per_1m_output_usd": 0.13,
+      "reason": "Very cheap Qwen model for broad low-cost comparison."
+    },
+    {
+      "label": "llama_scout",
+      "adapter": "openrouter-letter",
+      "model": "meta-llama/llama-4-scout",
+      "provider_family": "Meta Llama",
+      "category": "open_weight_llm_cheap",
+      "price_per_1m_input_usd": 0.10,
+      "price_per_1m_output_usd": 0.30,
+      "reason": "Western open-weight family baseline."
+    },
+    {
+      "label": "mistral_small",
+      "adapter": "openrouter-letter",
+      "model": "mistralai/mistral-small-2603",
+      "provider_family": "Mistral",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.15,
+      "price_per_1m_output_usd": 0.60,
+      "reason": "European/open-ish model family; good cheap baseline."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{"id":"toy_sentiment_001","question":"Classify the sentiment of this text: I loved the movie and would watch it again.","options":["negative","neutral","positive"],"answer":"C","metadata":{"benchmark":"toy_sentiment"}}
+{"id":"toy_sentiment_002","question":"Classify the sentiment of this text: The package arrived three days late and the box was crushed.","options":["negative","neutral","positive"],"answer":"A","metadata":{"benchmark":"toy_sentiment"}}
+{"id":"toy_topic_001","question":"Which topic best fits this sentence? The central bank raised interest rates after inflation accelerated.","options":["sports","finance","cooking","travel"],"answer":"B","metadata":{"benchmark":"toy_topic"}}
+{"id":"toy_intent_001","question":"Classify the user intent: Can you reset my password?","options":["billing question","technical support","sales inquiry"],"answer":"B","metadata":{"benchmark":"toy_intent"}}
+

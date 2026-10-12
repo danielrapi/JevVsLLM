@@ -1,0 +1,89 @@
+{
+  "name": "cheap_tier_chat_only_rerun",
+  "purpose": "OpenRouter-only cheap/balanced first-pass models intended to test whether low-cost LLMs and open/open-ish models are similar to Jev on classification.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 100,
+  "status": "proposed_for_user_approval",
+  "models": [
+    {
+      "label": "openai_luna",
+      "adapter": "openrouter-letter",
+      "model": "openai/gpt-5.6-luna",
+      "provider_family": "OpenAI",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.2,
+      "price_per_1m_output_usd": 1.2,
+      "reason": "OpenAI cheap/high-volume tier through OpenRouter."
+    },
+    {
+      "label": "claude_haiku",
+      "adapter": "openrouter-letter",
+      "model": "anthropic/claude-haiku-5.5",
+      "provider_family": "Anthropic",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.1,
+      "price_per_1m_output_usd": 0.5,
+      "reason": "Anthropic low-cost/high-volume tier."
+    },
+    {
+      "label": "gemini_flash_lite",
+      "adapter": "openrouter-letter",
+      "model": "google/gemini-3.5-flash-lite",
+      "provider_family": "Google",
+      "category": "closed_llm_cheap",
+      "price_per_1m_input_usd": 0.3,
+      "price_per_1m_output_usd": 2.5,
+      "reason": "Google low-latency/high-volume tier."
+    },
+    {
+      "label": "deepseek_flash_latest",
+      "adapter": "openrouter-letter",
+      "model": "~deepseek/deepseek-flash-latest",
+      "provider_family": "DeepSeek",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.0348,
+      "price_per_1m_output_usd": 0.1392,
+      "reason": "Very cheap open/open-ish model family candidate."
+    },
+    {
+      "label": "qwen_flash",
+      "adapter": "openrouter-letter",
+      "model": "qwen/qwen3.7-flash",
+      "provider_family": "Qwen",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.03,
+      "price_per_1m_output_usd": 0.13,
+      "reason": "Very cheap Qwen model for broad low-cost comparison."
+    },
+    {
+      "label": "llama_scout",
+      "adapter": "openrouter-letter",
+      "model": "meta-llama/llama-4-scout",
+      "provider_family": "Meta Llama",
+      "category": "open_weight_llm_cheap",
+      "price_per_1m_input_usd": 0.1,
+      "price_per_1m_output_usd": 0.3,
+      "reason": "Western open-weight family baseline."
+    },
+    {
+      "label": "mistral_small",
+      "adapter": "openrouter-letter",
+      "model": "mistralai/mistral-small-2603",
+      "provider_family": "Mistral",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.15,
+      "price_per_1m_output_usd": 0.6,
+      "reason": "European/open-ish model family; good cheap baseline."
+    },
+    {
+      "label": "kimi_k2_5",
+      "adapter": "openrouter-letter",
+      "model": "moonshotai/kimi-k2.5",
+      "provider_family": "Moonshot/Kimi",
+      "category": "open_or_openish_llm_cheap",
+      "price_per_1m_input_usd": 0.5,
+      "price_per_1m_output_usd": 2.5,
+      "reason": "Long-context/open-ish Chinese model family; more expensive than DeepSeek/Qwen but still not frontier-priced."
+    }
+  ]
+}

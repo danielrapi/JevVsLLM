@@ -1,0 +1,1 @@
+{"id": "sst2_dev_00000", "question": "Classify the sentiment of this sentence: it 's a charming and often affecting journey .", "options": ["negative", "positive"], "answer": "B", "metadata": {"benchmark": "glue_sst2", "split": "dev", "source": "https://dl.fbaipublicfiles.com/glue/data/SST-2.zip", "source_index": 0}}
