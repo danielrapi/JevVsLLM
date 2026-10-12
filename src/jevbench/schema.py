@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import string
+import re
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -69,10 +70,27 @@ def normalize_prediction(value: str | int | None, options: list[str]) -> str:
     if upper in letters:
         return upper
 
+    trailing_letter = re.search(r"(?:^|\n)\s*([A-Z])\s*$", upper)
+    if trailing_letter and trailing_letter.group(1) in letters:
+        return trailing_letter.group(1)
+
     # Accept common model outputs like "A." or "A) positive".
     first = upper[0]
     if first in letters and (len(upper) == 1 or upper[1] in {".", ")", ":", " "}):
         return first
+
+    # Accept markdown-wrapped answers like "## A" or "**B**".
+    leading_letter = re.match(r"^[^A-Z0-9]*([A-Z])(?:[^A-Z0-9]|$)", upper)
+    if leading_letter and leading_letter.group(1) in letters:
+        return leading_letter.group(1)
+
+    # Accept explicit answer phrases while avoiding arbitrary letters in explanations.
+    answer_phrase = re.search(
+        r"\b(?:ANSWER|FINAL ANSWER|CORRECT ANSWER)\s*(?:IS|:|-)?\s*([A-Z])\b",
+        upper,
+    )
+    if answer_phrase and answer_phrase.group(1) in letters:
+        return answer_phrase.group(1)
 
     for i, option in enumerate(options):
         if text.casefold() == option.strip().casefold():
@@ -90,5 +108,7 @@ def format_letter_prompt(example: Example) -> str:
     return (
         f"{example.question.strip()}\n\n"
         f"Options:\n{rendered_options}\n\n"
-        f"Answer with exactly one letter from {allowed}."
+        f"Answer with exactly one letter from {allowed}.\n"
+        "Your entire response must be exactly one character. "
+        "Do not include markdown, punctuation, explanation, or the option text."
     )

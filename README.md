@@ -16,18 +16,18 @@ Starter suite: 6 datasets × 100 examples each.
 |---|---:|---:|---:|
 | Qwen 3.7 Flash | 89.0% | 750 ms | $0.0357 |
 | Jev | 88.8% | 292 ms | $0.1161 |
-| DeepSeek V4.1 Flash | 88.7% | 418 ms | $0.1473 |
+| Gemini Flash Lite | 88.8% | 622 ms | $0.3183 |
+| DeepSeek V4.1 Flash | 88.8% | 418 ms | $0.1471 |
 | OpenAI Luna | 88.2% | 836 ms | $0.2396 |
-| Claude Haiku | 87.7% | 1144 ms | $0.1589 |
-| Gemini Flash Lite | 80.5% | 615 ms | $0.3204 |
-| Llama Scout | 80.3% | 763 ms | $0.1564 |
-| Mistral Small | 64.0% | 573 ms | $0.1262 |
+| Claude Haiku | 88.0% | 1144 ms | $0.1604 |
+| Llama Scout | 83.2% | 765 ms | $0.1568 |
+| Mistral Small | 79.0% | 530 ms | $0.1593 |
 
 Early takeaways:
 
 - Jev is the latency leader by a large margin.
 - Cheap LLMs can be competitive on accuracy for simple classification.
-- Qwen and DeepSeek are especially strong low-cost baselines in this first suite.
+- Qwen, Gemini Flash Lite, and DeepSeek are especially strong low-cost baselines in this first suite.
 - Larger and harder datasets are needed before treating these as final rankings.
 
 Full results:

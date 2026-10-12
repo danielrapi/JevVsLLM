@@ -495,7 +495,8 @@ class OpenRouterLetterAdapter(Adapter):
                     "role": "system",
                     "content": (
                         "You are evaluating a multiple-choice classification task. "
-                        "Return exactly one capital letter and no other text."
+                        "Return exactly one capital letter and no other text. "
+                        "Your entire response must be exactly one character."
                     ),
                 },
                 {"role": "user", "content": prompt},
