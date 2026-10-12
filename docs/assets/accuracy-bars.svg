@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="460" viewBox="0 0 920 460" role="img" aria-labelledby="title desc">
+<title>Average accuracy by model</title><desc>Horizontal bar chart showing model accuracy.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="460.0" y="32" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#111827">Average accuracy across starter suite</text>
+<line x1="190.0" y1="60" x2="190.0" y2="415" stroke="#e5e7eb"/>
+<text x="190.0" y="442" text-anchor="middle" font-family="Arial" font-size="12" fill="#4b5563">75%</text>
+<line x1="410.0" y1="60" x2="410.0" y2="415" stroke="#e5e7eb"/>
+<text x="410.0" y="442" text-anchor="middle" font-family="Arial" font-size="12" fill="#4b5563">80%</text>
+<line x1="630.0" y1="60" x2="630.0" y2="415" stroke="#e5e7eb"/>
+<text x="630.0" y="442" text-anchor="middle" font-family="Arial" font-size="12" fill="#4b5563">85%</text>
+<line x1="850.0" y1="60" x2="850.0" y2="415" stroke="#e5e7eb"/>
+<text x="850.0" y="442" text-anchor="middle" font-family="Arial" font-size="12" fill="#4b5563">90%</text>
+<text x="178" y="86.2" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Mistral Small</text>
+<rect x="190.0" y="72.2" width="176.0" height="20" rx="5" fill="#dc2626"/>
+<text x="374.0" y="86.2" font-family="Arial" font-size="13" fill="#111827">79.0%</text>
+<text x="178" y="130.6" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Llama Scout</text>
+<rect x="190.0" y="116.6" width="359.3" height="20" rx="5" fill="#64748b"/>
+<text x="557.3" y="130.6" font-family="Arial" font-size="13" fill="#111827">83.2%</text>
+<text x="178" y="174.9" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Claude Haiku</text>
+<rect x="190.0" y="160.9" width="572.0" height="20" rx="5" fill="#9333ea"/>
+<text x="770.0" y="174.9" font-family="Arial" font-size="13" fill="#111827">88.0%</text>
+<text x="178" y="219.3" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">OpenAI Luna</text>
+<rect x="190.0" y="205.3" width="579.3" height="20" rx="5" fill="#ea580c"/>
+<text x="777.3" y="219.3" font-family="Arial" font-size="13" fill="#111827">88.2%</text>
+<text x="178" y="263.7" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Jev</text>
+<rect x="190.0" y="249.7" width="608.7" height="20" rx="5" fill="#2563eb"/>
+<text x="806.7" y="263.7" font-family="Arial" font-size="13" fill="#111827">88.8%</text>
+<text x="178" y="308.1" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Gemini Flash Lite</text>
+<rect x="190.0" y="294.1" width="608.7" height="20" rx="5" fill="#7c3aed"/>
+<text x="806.7" y="308.1" font-family="Arial" font-size="13" fill="#111827">88.8%</text>
+<text x="178" y="352.4" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">DeepSeek V4.1 Flash</text>
+<rect x="190.0" y="338.4" width="608.7" height="20" rx="5" fill="#0891b2"/>
+<text x="806.7" y="352.4" font-family="Arial" font-size="13" fill="#111827">88.8%</text>
+<text x="178" y="396.8" text-anchor="end" font-family="Arial" font-size="13" fill="#111827">Qwen 3.7 Flash</text>
+<rect x="190.0" y="382.8" width="616.0" height="20" rx="5" fill="#16a34a"/>
+<text x="814.0" y="396.8" font-family="Arial" font-size="13" fill="#111827">89.0%</text>
+</svg>

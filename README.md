@@ -12,16 +12,24 @@ All models are evaluated through OpenRouter. Each task is converted into a commo
 
 Starter suite: 6 datasets × 100 examples each.
 
+Legend: 🟢 strong, 🟡 acceptable, 🔴 weak.
+
 | Model | Avg accuracy | Avg p50 latency | Cost / 1k, summed across suite |
 |---|---:|---:|---:|
-| Qwen 3.7 Flash | 89.0% | 750 ms | $0.0357 |
-| Jev | 88.8% | 292 ms | $0.1161 |
-| Gemini Flash Lite | 88.8% | 622 ms | $0.3183 |
-| DeepSeek V4.1 Flash | 88.8% | 418 ms | $0.1471 |
-| OpenAI Luna | 88.2% | 836 ms | $0.2396 |
-| Claude Haiku | 88.0% | 1144 ms | $0.1604 |
-| Llama Scout | 83.2% | 765 ms | $0.1568 |
-| Mistral Small | 79.0% | 530 ms | $0.1593 |
+| Qwen 3.7 Flash | 🟢 89.0% | 🟡 750 ms | 🟢 $0.0357 |
+| Jev | 🟢 88.8% | 🟢 292 ms | 🟢 $0.1161 |
+| Gemini Flash Lite | 🟢 88.8% | 🟡 622 ms | 🔴 $0.3183 |
+| DeepSeek V4.1 Flash | 🟢 88.8% | 🟢 418 ms | 🟢 $0.1471 |
+| OpenAI Luna | 🟡 88.2% | 🟡 836 ms | 🟡 $0.2396 |
+| Claude Haiku | 🟡 88.0% | 🔴 1144 ms | 🟡 $0.1604 |
+| Llama Scout | 🟡 83.2% | 🟡 765 ms | 🟡 $0.1568 |
+| Mistral Small | 🔴 79.0% | 🟢 530 ms | 🟡 $0.1593 |
+
+![Average accuracy by model](docs/assets/accuracy-bars.svg)
+
+![Accuracy vs latency](docs/assets/accuracy-vs-latency.svg)
+
+![Accuracy vs cost](docs/assets/accuracy-vs-cost.svg)
 
 Early takeaways:
 
