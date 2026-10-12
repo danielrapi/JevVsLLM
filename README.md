@@ -1,53 +1,54 @@
-# Jev vs. Cheap Classification Models
+# Jev vs. LLMs for Classification
 
-Benchmark language classification tasks across decision models and cheap LLMs using the same multiple-choice interface.
+This repo benchmarks Jev against low-cost LLMs on language classification tasks.
 
-The current experiment compares Jev on OpenRouter against low-cost OpenRouter chat models. Each example is converted to a question with options `A`, `B`, `C`, etc. Chat models must answer with one letter; Jev uses the OpenRouter Decisions API.
+The core question:
 
-## Current takeaways
+> For classification, can general-purpose LLMs match a decision model like Jev on accuracy, latency, and cost?
+
+All models are evaluated through OpenRouter. Each task is converted into a common multiple-choice format. Chat models receive the question plus answer options and must return a single letter (`A`, `B`, `C`, ...). Jev is evaluated through OpenRouter’s Decisions API.
+
+## Headline results
 
 Starter suite: 6 datasets × 100 examples each.
 
-| Model | Avg accuracy | Invalid rate | Avg p50 latency | Sum cost/1k across suite |
-|---|---:|---:|---:|---:|
-| Qwen 3.7 Flash | 89.0% | 0.0% | 750 ms | $0.0357 |
-| Jev OpenRouter | 88.8% | 0.0% | 292 ms | $0.1161 |
-| DeepSeek V4.1 Flash | 88.7% | 0.2% | 418 ms | $0.1473 |
-| OpenAI Luna | 88.2% | 0.0% | 836 ms | $0.2396 |
-| Claude Haiku | 87.7% | 0.3% | 1144 ms | $0.1589 |
-| Gemini Flash Lite | 80.5% | 9.8% | 615 ms | $0.3204 |
-| Llama Scout | 80.3% | 2.8% | 763 ms | $0.1564 |
-| Mistral Small | 64.0% | 19.5% | 573 ms | $0.1262 |
+| Model | Avg accuracy | Avg p50 latency | Cost / 1k, summed across suite |
+|---|---:|---:|---:|
+| Qwen 3.7 Flash | 89.0% | 750 ms | $0.0357 |
+| Jev | 88.8% | 292 ms | $0.1161 |
+| DeepSeek V4.1 Flash | 88.7% | 418 ms | $0.1473 |
+| OpenAI Luna | 88.2% | 836 ms | $0.2396 |
+| Claude Haiku | 87.7% | 1144 ms | $0.1589 |
+| Gemini Flash Lite | 80.5% | 615 ms | $0.3204 |
+| Llama Scout | 80.3% | 763 ms | $0.1564 |
+| Mistral Small | 64.0% | 573 ms | $0.1262 |
 
-High-level read:
+Early takeaways:
 
-- Jev is the fastest and most stable: zero invalids and ~292 ms average median latency.
-- Qwen and DeepSeek are very competitive on accuracy once reasoning is disabled.
-- Luna is close on accuracy, but BYOK means cost is paid through the OpenAI account, not OpenRouter.
-- Mistral and Gemini need more prompt/provider tuning before they are fair cheap-tier candidates.
+- Jev is the latency leader by a large margin.
+- Cheap LLMs can be competitive on accuracy for simple classification.
+- Qwen and DeepSeek are especially strong low-cost baselines in this first suite.
+- Larger and harder datasets are needed before treating these as final rankings.
 
-Full merged summary:
+Full results:
 
-[summaries/cheap_tier_starter_suite_100.json](/Users/danielrapoport/.codex/.chatgpt-projects/g-p-6acbd04100648191899cdf9d909eb0f2/summaries/cheap_tier_starter_suite_100.json)
-
-Compact result table:
-
-[summaries/cheap_tier_starter_suite_100_table.md](/Users/danielrapoport/.codex/.chatgpt-projects/g-p-6acbd04100648191899cdf9d909eb0f2/summaries/cheap_tier_starter_suite_100_table.md)
+- [Merged JSON summary](summaries/cheap_tier_starter_suite_100.json)
+- [Compact markdown table](summaries/cheap_tier_starter_suite_100_table.md)
 
 ## Datasets
 
-All datasets are converted to a common JSONL schema.
+The starter suite contains 100 examples from each dataset:
 
-| Dataset | Task | File |
-|---|---|---|
-| SST-2 | sentiment | `data/sst2_dev_100.jsonl` |
-| AG News | topic classification | `data/ag_news_test_100.jsonl` |
-| TREC | question type | `data/trec_test_100.jsonl` |
-| BoolQ | yes/no reading comprehension | `data/boolq_val_100.jsonl` |
-| ARC-Challenge | science multiple choice | `data/arc_challenge_dev_100.jsonl` |
-| 20 Newsgroups | 20-way topic classification | `data/20_newsgroups_test_100.jsonl` |
+| Dataset | Task |
+|---|---|
+| SST-2 | sentiment |
+| AG News | news topic classification |
+| TREC | question type classification |
+| BoolQ | yes/no reading comprehension |
+| ARC-Challenge | science multiple-choice QA |
+| 20 Newsgroups | 20-way topic classification |
 
-Example row:
+All datasets are converted to the same JSONL schema:
 
 ```json
 {
@@ -60,23 +61,26 @@ Example row:
 
 ## Metrics
 
-The harness tracks:
+The benchmark reports:
 
 - accuracy
 - macro-F1 and weighted-F1
-- invalid-output rate
-- error rate
 - p50 / p95 latency
-- token counts
+- token usage
 - estimated cost
-- cost per 1k examples
 - cost per correct answer
 
-Invalid outputs count as wrong. That is intentional: invalid output is a product failure for classification.
+## Repo structure
 
-## Running
+```text
+data/          Converted benchmark datasets
+experiments/   Model and dataset manifests
+src/jevbench/  Benchmark harness
+summaries/     Result summaries
+tests/         Unit tests
+```
 
-Install:
+## Setup
 
 ```bash
 python -m venv .venv
@@ -88,11 +92,9 @@ Create `.env`:
 
 ```bash
 OPENROUTER_API_KEY=...
-OPENAI_API_KEY=...
-TYPESAFE_API_KEY=...
 ```
 
-Download the starter dataset suite:
+## Download datasets
 
 ```bash
 PYTHONPATH=src python3 -m jevbench.cli datasets starter-suite \
@@ -100,7 +102,7 @@ PYTHONPATH=src python3 -m jevbench.cli datasets starter-suite \
   --limit 100
 ```
 
-Run the cheap-tier suite:
+## Run the cheap-tier suite
 
 ```bash
 PYTHONPATH=src python3 -m jevbench.cli run-suite \
@@ -111,19 +113,28 @@ PYTHONPATH=src python3 -m jevbench.cli run-suite \
   --concurrency 4
 ```
 
-Retry only invalid/error rows:
+## Run one model on one dataset
 
 ```bash
-PYTHONPATH=src python3 -m jevbench.cli retry-invalid \
-  --run runs/.../model.jsonl \
+PYTHONPATH=src python3 -m jevbench.cli run \
   --dataset data/sst2_dev_100.jsonl \
   --adapter openrouter-letter \
   --model qwen/qwen3.7-flash \
-  --out runs/.../model_repaired.jsonl
+  --input-price-per-1m 0.03 \
+  --output-price-per-1m 0.13 \
+  --out runs/qwen_sst2_100.jsonl \
+  --concurrency 4
+```
+
+## Compare runs
+
+```bash
+PYTHONPATH=src python3 -m jevbench.cli compare \
+  --dataset data/sst2_dev_100.jsonl \
+  runs/cheap_tier_starter_suite_100/sst2/jev_openrouter.jsonl \
+  runs/cheap_tier_starter_suite_100/sst2/qwen_flash.jsonl
 ```
 
 ## Notes
 
-- OpenRouter BYOK can report zero cost even when the upstream provider charges separately. The current Luna summary is manually adjusted with OpenAI Luna pricing.
-- Some models need provider-specific controls. DeepSeek and Qwen required `reasoning.enabled=false` to avoid spending the small output budget on hidden reasoning.
-- Gemini rejected or mishandled the reasoning parameter, so Gemini was rerun with that parameter omitted.
+This is an early benchmark harness, not a final leaderboard. The first suite is deliberately small so that model behavior, cost, and latency can be inspected quickly. The next step is to scale to more datasets and larger samples.
