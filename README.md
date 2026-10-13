@@ -67,8 +67,36 @@ Per-dataset accuracy for the strongest configurations:
 Full report:
 
 - [Full per-dataset report](results/output_modes_focused_2000.md)
+- [Good-tier letter-only report](results/good_tier_core_no_terra_letter_2000.md)
 - [Raw combined JSON summary](summaries/output_modes_focused_2000.json)
 - [Letter-vs-structured comparison table](summaries/output_modes_focused_2000_modes.md)
+
+## Good-tier letter-only run
+
+After the cheap-tier output-mode test, we ran a smaller “good model” comparison using only the letter/code output path. Models that required reasoning-first behavior or had unstable routing for this setup were omitted.
+
+| Configuration | Accuracy | Failures | Cost | p50 latency |
+|---|---:|---:|---:|---:|
+| Jev | 89.1% | 1 | $0.27 | 283 ms |
+| Qwen Plus letter | 88.3% | 0 | $1.13 | 1279 ms |
+| OpenAI Sol letter | 86.8% | 392 | $6.59 | 1190 ms |
+| DeepSeek Pro letter | 86.1% | 33 | $1.35 | 1016 ms |
+
+Per-dataset winners:
+
+| Dataset | Winner | Accuracy |
+|---|---|---:|
+| Banking77 | OpenAI Sol | 86.9% |
+| AG News | OpenAI Sol | 83.8% |
+| BoolQ | Jev | 92.5% |
+| ARC Challenge | Qwen Plus | 97.9% |
+| MMLU | Jev | 93.2% |
+
+OpenAI Sol’s MMLU route returned many empty OpenRouter responses. We reran those invalid rows several times with a larger output-token cap and merged all successful repairs, but 392 Sol/MMLU rows still failed and are counted as incorrect.
+
+The good-tier result reinforces the earlier pattern: stronger LLMs help on broad text classification, but Jev remains strongest overall and especially strong on the harder QA-style datasets. Qwen Plus is the closest clean LLM competitor in this setup.
+
+One caveat: these are public benchmark datasets, so training-data contamination cannot be ruled out for Jev or any LLM. A fresh/private validation set should be the next check before making strong generalization claims.
 
 ## Datasets
 

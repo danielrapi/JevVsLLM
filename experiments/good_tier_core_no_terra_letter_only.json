@@ -1,0 +1,48 @@
+{
+  "name": "good_tier_core_no_terra_letter_only",
+  "purpose": "Full focused-suite run for the clean good-tier letter/code models, excluding OpenAI Terra and omitting Anthropic/Gemini reasoning-heavy routes.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 2000,
+  "models": [
+    {
+      "label": "jev_openrouter",
+      "adapter": "jev-openrouter",
+      "model": "~typesafe/jev-latest",
+      "output_mode": "decision_api",
+      "provider_family": "TypeSafe via OpenRouter",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "openai_sol_letter",
+      "adapter": "openrouter-letter",
+      "model": "openai/gpt-5.6-sol",
+      "output_mode": "letter",
+      "provider_family": "OpenAI",
+      "category": "closed_llm_strong",
+      "price_per_1m_input_usd": 2.0,
+      "price_per_1m_output_usd": 10.0
+    },
+    {
+      "label": "deepseek_pro_latest_letter",
+      "adapter": "openrouter-letter",
+      "model": "~deepseek/deepseek-pro-latest",
+      "output_mode": "letter",
+      "provider_family": "DeepSeek",
+      "category": "open_or_openish_llm_strong",
+      "price_per_1m_input_usd": 0.21912,
+      "price_per_1m_output_usd": 0.65736
+    },
+    {
+      "label": "qwen_plus_letter",
+      "adapter": "openrouter-letter",
+      "model": "qwen/qwen3.7-plus",
+      "output_mode": "letter",
+      "provider_family": "Qwen",
+      "category": "open_or_openish_llm_balanced",
+      "price_per_1m_input_usd": 0.32,
+      "price_per_1m_output_usd": 1.28
+    }
+  ]
+}

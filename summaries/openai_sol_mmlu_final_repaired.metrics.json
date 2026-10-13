@@ -1,0 +1,99 @@
+{
+  "adapter": "openrouter-letter",
+  "n": 2000,
+  "accuracy": 0.7385,
+  "errors": 392,
+  "invalid": 392,
+  "error_rate": 0.196,
+  "invalid_rate": 0.196,
+  "macro_precision": 0.9184861518671038,
+  "macro_recall": 0.9180819417030435,
+  "macro_f1": 0.9182273503201732,
+  "weighted_precision": 0.9185836517106627,
+  "weighted_recall": 0.9185323383084577,
+  "weighted_f1": 0.9185018753484594,
+  "mean_latency_ms": 1701.713656004351,
+  "median_latency_ms": 1731.1142920007114,
+  "p90_latency_ms": 2425.1777500030585,
+  "p95_latency_ms": 2808.9080410136376,
+  "p99_latency_ms": 3750.549000003957,
+  "total_cost_usd": 0.573650500000001,
+  "mean_cost_usd": 0.00035674782338308456,
+  "cost_per_1k_usd": 0.2868252500000005,
+  "cost_per_correct_usd": 0.0003883889641164529,
+  "input_tokens": 246367,
+  "output_tokens": 8040,
+  "mean_input_tokens": 153.21330845771143,
+  "mean_output_tokens": 5,
+  "per_class": [
+    {
+      "label": "A",
+      "support": 365,
+      "true_positive": 333,
+      "false_positive": 29,
+      "false_negative": 32,
+      "precision": 0.919889502762431,
+      "recall": 0.9123287671232877,
+      "f1": 0.9160935350756534
+    },
+    {
+      "label": "B",
+      "support": 390,
+      "true_positive": 352,
+      "false_positive": 31,
+      "false_negative": 38,
+      "precision": 0.9190600522193212,
+      "recall": 0.9025641025641026,
+      "f1": 0.9107373868046572
+    },
+    {
+      "label": "C",
+      "support": 406,
+      "true_positive": 379,
+      "false_positive": 37,
+      "false_negative": 27,
+      "precision": 0.9110576923076923,
+      "recall": 0.9334975369458128,
+      "f1": 0.9221411192214112
+    },
+    {
+      "label": "D",
+      "support": 447,
+      "true_positive": 413,
+      "false_positive": 34,
+      "false_negative": 34,
+      "precision": 0.9239373601789709,
+      "recall": 0.9239373601789709,
+      "f1": 0.9239373601789709
+    }
+  ],
+  "confusion_matrix": {
+    "A": {
+      "A": 333,
+      "B": 9,
+      "C": 11,
+      "D": 12
+    },
+    "B": {
+      "A": 10,
+      "B": 352,
+      "C": 13,
+      "D": 15
+    },
+    "C": {
+      "A": 10,
+      "B": 10,
+      "C": 379,
+      "D": 7
+    },
+    "D": {
+      "A": 9,
+      "B": 12,
+      "C": 13,
+      "D": 413
+    }
+  },
+  "brier_score": null,
+  "ece": null,
+  "mean_confidence": null
+}
