@@ -12,7 +12,14 @@ from pathlib import Path
 from typing import Any
 
 from .io import read_jsonl_dicts
-from .schema import Example, Prediction, format_letter_prompt, normalize_prediction, option_letters
+from .schema import (
+    Example,
+    Prediction,
+    format_letter_prompt,
+    format_structured_label_prompt,
+    normalize_prediction,
+    option_letters,
+)
 
 
 def _first_env(names: tuple[str, ...]) -> str | None:
@@ -423,7 +430,7 @@ class OpenAILetterAdapter(Adapter):
                 reasoning={"effort": self.reasoning_effort},
                 instructions=(
                     "You are evaluating a multiple-choice classification task. "
-                    "Return exactly one capital letter and no other text."
+                    "Return exactly one answer code and no other text."
                 ),
                 input=prompt,
                 max_output_tokens=self.max_output_tokens,
@@ -495,8 +502,8 @@ class OpenRouterLetterAdapter(Adapter):
                     "role": "system",
                     "content": (
                         "You are evaluating a multiple-choice classification task. "
-                        "Return exactly one capital letter and no other text. "
-                        "Your entire response must be exactly one character."
+                        "Return exactly one answer code and no other text. "
+                        "For large option sets the code may be a number."
                     ),
                 },
                 {"role": "user", "content": prompt},
@@ -581,6 +588,105 @@ class OpenRouterLetterAdapter(Adapter):
         raise RuntimeError("OpenRouter API request failed after retries")
 
 
+class OpenRouterStructuredLabelAdapter(OpenRouterLetterAdapter):
+    name = "openrouter-structured-label"
+
+    def __init__(
+        self,
+        model: str,
+        api_key: str | None = None,
+        input_price_per_1m: float | None = None,
+        output_price_per_1m: float | None = None,
+        base_url: str = "https://openrouter.ai/api/v1/chat/completions",
+        max_output_tokens: int = 80,
+        reasoning_enabled: bool | None = False,
+        timeout_seconds: float = 60,
+    ):
+        super().__init__(
+            model=model,
+            api_key=api_key,
+            input_price_per_1m=input_price_per_1m,
+            output_price_per_1m=output_price_per_1m,
+            base_url=base_url,
+            max_output_tokens=max_output_tokens,
+            reasoning_enabled=reasoning_enabled,
+            timeout_seconds=timeout_seconds,
+        )
+
+    def predict(self, example: Example) -> Prediction:
+        prompt = format_structured_label_prompt(example)
+        payload = {
+            "model": self.model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are evaluating a classification task. Return only valid JSON "
+                        'with this exact shape: {"answer": "<label>"}. The answer must be '
+                        "one of the provided label strings."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0,
+            "max_tokens": self.max_output_tokens,
+        }
+        if self.reasoning_enabled is not None:
+            payload["reasoning"] = {"enabled": self.reasoning_enabled}
+
+        start = time.perf_counter()
+        try:
+            response_payload = self._post(payload)
+            latency_ms = (time.perf_counter() - start) * 1000
+            choice = response_payload.get("choices", [{}])[0]
+            message = choice.get("message", {})
+            content = message.get("content")
+            raw_text = content.strip() if isinstance(content, str) else ""
+            usage = response_payload.get("usage") or {}
+            input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens")
+            output_tokens = usage.get("completion_tokens") or usage.get("output_tokens")
+            cost = usage.get("cost")
+            if cost is None or cost == 0:
+                cost = _estimate_cost(
+                    input_tokens,
+                    output_tokens,
+                    self.input_price_per_1m,
+                    self.output_price_per_1m,
+                )
+
+            parse_error = None
+            try:
+                raw_label = _extract_structured_answer(raw_text)
+            except Exception as exc:
+                raw_label = raw_text
+                parse_error = str(exc)
+
+            return self._prediction(
+                example,
+                raw_label,
+                latency_ms,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                estimated_cost_usd=cost,
+                raw_output={
+                    "response_id": response_payload.get("id"),
+                    "model": response_payload.get("model", self.model),
+                    "provider": response_payload.get("provider"),
+                    "finish_reason": choice.get("finish_reason"),
+                    "message": _safe_dump(message),
+                    "structured_text": raw_text,
+                },
+                error=parse_error,
+            )
+        except Exception as exc:
+            return self._prediction(
+                example,
+                None,
+                (time.perf_counter() - start) * 1000,
+                error=str(exc),
+            )
+
+
 def _extract_response_tokens(response: Any) -> tuple[int | None, int | None]:
     usage = getattr(response, "usage", None)
     if usage is None:
@@ -588,6 +694,25 @@ def _extract_response_tokens(response: Any) -> tuple[int | None, int | None]:
     input_tokens = getattr(usage, "input_tokens", None)
     output_tokens = getattr(usage, "output_tokens", None)
     return input_tokens, output_tokens
+
+
+def _extract_structured_answer(raw_text: str) -> str:
+    text = raw_text.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+
+    payload = json.loads(text)
+    if not isinstance(payload, dict):
+        raise ValueError("structured output is not a JSON object")
+    answer = payload.get("answer")
+    if not isinstance(answer, str) or not answer.strip():
+        raise ValueError("structured output is missing a string `answer` field")
+    return answer.strip()
 
 
 def _safe_dump(value: Any) -> Any:

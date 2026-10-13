@@ -6,66 +6,94 @@ The core question:
 
 > For classification, can general-purpose LLMs match a decision model like Jev on accuracy, latency, and cost?
 
-All models are evaluated through OpenRouter. Each task is converted into a common multiple-choice format. Chat models receive the question plus answer options and must return a single letter (`A`, `B`, `C`, ...). Jev is evaluated through OpenRouter’s Decisions API.
+All model calls in the main experiment run through OpenRouter. Each task is converted into a common multiple-choice format. Chat models are tested in two output modes:
 
-## Headline results
+- **Letter/code mode:** append the answer options and ask the model to return only the selected code, such as `A` or `3`.
+- **Structured-label mode:** ask the model to return JSON containing the real category name, such as `{ "answer": "business" }`.
 
-Starter suite: 6 datasets × 100 examples each.
+Jev is evaluated through OpenRouter’s Decisions API.
 
-Legend: 🟢 strong, 🟡 acceptable, 🔴 weak.
+## Headline result
 
-| Model | Avg accuracy | Avg p50 latency | Cost / 1k, summed across suite |
+Main run: 5 datasets × 2,000 examples each, for 130,000 total decisions.
+
+| Configuration | Accuracy | Cost | p50 latency |
 |---|---:|---:|---:|
-| Qwen 3.7 Flash | 🟢 89.0% | 🟡 750 ms | 🟢 $0.0357 |
-| Jev | 🟢 88.8% | 🟢 292 ms | 🟢 $0.1161 |
-| Gemini Flash Lite | 🟢 88.8% | 🟡 622 ms | 🔴 $0.3183 |
-| DeepSeek V4.1 Flash | 🟢 88.8% | 🟢 418 ms | 🟢 $0.1471 |
-| OpenAI Luna | 🟡 88.2% | 🟡 836 ms | 🟡 $0.2396 |
-| Claude Haiku | 🟡 88.0% | 🔴 1144 ms | 🟡 $0.1604 |
-| Llama Scout | 🟡 83.2% | 🟡 765 ms | 🟡 $0.1568 |
-| Mistral Small | 🔴 79.0% | 🟢 530 ms | 🟡 $0.1593 |
+| Jev | 89.0% | $0.27 | 288 ms |
+| DeepSeek Flash, letter | 88.0% | $0.55 | 395 ms |
+| OpenAI Luna, letter | 87.7% | $0.68 | 825 ms |
+| Gemini Flash Lite, letter | 87.0% | $1.11 | 659 ms |
+| Qwen Flash, letter | 85.8% | $0.11 | 751 ms |
+| Claude Haiku, structured | 83.5% | $0.69 | 1131 ms |
+| Llama Scout, structured | 68.9% | $0.61 | 3118 ms |
 
-![Average accuracy by model](docs/assets/accuracy-bars.svg)
+Main takeaways:
 
-![Accuracy vs latency](docs/assets/accuracy-vs-latency.svg)
+- Jev had the best aggregate accuracy, lowest latency, and no output/API failures.
+- The single-letter/code method was usually better than normal structured-label JSON: similar or better accuracy, lower cost, and lower latency.
+- Structured-label output increased output tokens by roughly 2.4× to 8.4× depending on the model.
+- DeepSeek Flash was the strongest cheap LLM competitor by accuracy.
+- Qwen Flash was the cheapest clean LLM setup, but a few points behind Jev, DeepSeek, Luna, and Gemini.
+- Llama Scout was not reliable in this prompt/setup: many invalid outputs and very high tail latency.
 
-![Accuracy vs cost](docs/assets/accuracy-vs-cost.svg)
+Output/API failures are counted as incorrect in accuracy. In this run they mostly meant either upstream OpenRouter/provider rate limits, especially for Llama Scout, or a model ignoring the requested response schema and returning reasoning text instead of the answer.
 
-Early takeaways:
+## Accuracy breakdown
 
-- Jev is the latency leader by a large margin.
-- Cheap LLMs can be competitive on accuracy for simple classification.
-- Qwen, Gemini Flash Lite, and DeepSeek are especially strong low-cost baselines in this first suite.
-- Larger and harder datasets are needed before treating these as final rankings.
+Average accuracy hides some important structure. The main pattern is:
 
-Full results:
+- LLMs beat Jev on the broad text-classification datasets: Banking77 and AG News.
+- Jev wins on the harder multiple-choice / reasoning-style datasets: BoolQ, ARC Challenge, and MMLU.
+- The letter/code format is usually at least as accurate as structured-label JSON, while being cheaper and producing fewer tokens.
 
-- [Merged JSON summary](summaries/cheap_tier_starter_suite_100.json)
-- [Compact markdown table](summaries/cheap_tier_starter_suite_100_table.md)
+| Dataset | Best configuration | Best acc | Jev acc | Best LLM gap vs Jev |
+|---|---|---:|---:|---:|
+| Banking77 | Luna letter | 85.2% | 79.6% | +5.6 pp |
+| AG News | DeepSeek Flash structured | 86.1% | 81.8% | +4.3 pp |
+| BoolQ | Jev | 92.4% | 92.4% | -0.7 pp |
+| ARC Challenge | Jev | 97.8% | 97.8% | -0.3 pp |
+| MMLU | Jev | 93.2% | 93.2% | -4.7 pp |
+
+Per-dataset accuracy for the strongest configurations:
+
+| Configuration | Avg acc | Banking77 | AG News | BoolQ | ARC | MMLU |
+|---|---:|---:|---:|---:|---:|---:|
+| Jev | 89.0% | 79.6% | 81.8% | 92.4% | 97.8% | 93.2% |
+| DeepSeek Flash letter | 88.0% | 79.1% | 84.3% | 91.6% | 96.5% | 88.5% |
+| Luna letter | 87.7% | 85.2% | 82.5% | 91.0% | 96.4% | 83.2% |
+| Gemini Flash Lite letter | 87.0% | 79.2% | 82.3% | 90.3% | 97.5% | 85.7% |
+| Qwen Flash letter | 85.8% | 76.0% | 82.0% | 90.8% | 96.3% | 83.9% |
+
+Full report:
+
+- [Full per-dataset report](results/output_modes_focused_2000.md)
+- [Raw combined JSON summary](summaries/output_modes_focused_2000.json)
+- [Letter-vs-structured comparison table](summaries/output_modes_focused_2000_modes.md)
 
 ## Datasets
 
-The starter suite contains 100 examples from each dataset:
+The focused run uses 2,000 examples from each dataset:
 
 | Dataset | Task |
 |---|---|
-| SST-2 | sentiment |
+| Banking77 | 77-way banking intent classification |
 | AG News | news topic classification |
-| TREC | question type classification |
 | BoolQ | yes/no reading comprehension |
-| ARC-Challenge | science multiple-choice QA |
-| 20 Newsgroups | 20-way topic classification |
+| ARC Challenge | science multiple-choice QA |
+| MMLU | broad knowledge multiple-choice QA |
 
 All datasets are converted to the same JSONL schema:
 
 ```json
 {
-  "id": "sst2_dev_00000",
-  "question": "Classify the sentiment of this sentence: ...",
-  "options": ["negative", "positive"],
-  "answer": "B"
+  "id": "ag_news_train_00000",
+  "question": "Classify this news article: ...",
+  "options": ["World", "Sports", "Business", "Sci/Tech"],
+  "answer": "2"
 }
 ```
+
+For datasets with up to 26 options, answer codes are letters. For larger label spaces, such as Banking77, answer codes are numeric.
 
 ## Metrics
 
@@ -73,18 +101,22 @@ The benchmark reports:
 
 - accuracy
 - macro-F1 and weighted-F1
+- invalid-output rate
 - p50 / p95 latency
 - token usage
 - estimated cost
 - cost per correct answer
+
+Invalid outputs count against accuracy.
 
 ## Repo structure
 
 ```text
 data/          Converted benchmark datasets
 experiments/   Model and dataset manifests
+results/       Human-readable experiment reports
 src/jevbench/  Benchmark harness
-summaries/     Result summaries
+summaries/     Machine-readable result summaries
 tests/         Unit tests
 ```
 
@@ -102,47 +134,34 @@ Create `.env`:
 OPENROUTER_API_KEY=...
 ```
 
-## Download datasets
+## Download the focused datasets
 
 ```bash
-PYTHONPATH=src python3 -m jevbench.cli datasets starter-suite \
+PYTHONPATH=src python3 -m jevbench.cli datasets focused-suite \
   --out-dir data \
-  --limit 100
+  --limit 2000
 ```
 
-## Run the cheap-tier suite
+## Run the focused output-mode suite
 
 ```bash
 PYTHONPATH=src python3 -m jevbench.cli run-suite \
-  --models-manifest experiments/cheap_tier_candidates.json \
-  --datasets-manifest experiments/starter_datasets_100.json \
-  --out-dir runs/cheap_tier_starter_suite_100 \
-  --summaries-out summaries/cheap_tier_starter_suite_100.json \
-  --concurrency 4
+  --models-manifest experiments/cheap_tier_output_modes_no_mistral.json \
+  --datasets-manifest experiments/focused_datasets_2000.json \
+  --out-dir runs/output_modes_focused_2000 \
+  --summaries-out summaries/output_modes_focused_2000.json \
+  --concurrency 16 \
+  --skip-existing
 ```
 
-## Run one model on one dataset
+## Compare letter vs. structured output modes
 
 ```bash
-PYTHONPATH=src python3 -m jevbench.cli run \
-  --dataset data/sst2_dev_100.jsonl \
-  --adapter openrouter-letter \
-  --model qwen/qwen3.7-flash \
-  --input-price-per-1m 0.03 \
-  --output-price-per-1m 0.13 \
-  --out runs/qwen_sst2_100.jsonl \
-  --concurrency 4
-```
-
-## Compare runs
-
-```bash
-PYTHONPATH=src python3 -m jevbench.cli compare \
-  --dataset data/sst2_dev_100.jsonl \
-  runs/cheap_tier_starter_suite_100/sst2/jev_openrouter.jsonl \
-  runs/cheap_tier_starter_suite_100/sst2/qwen_flash.jsonl
+PYTHONPATH=src python3 -m jevbench.cli compare-output-modes \
+  summaries/output_modes_focused_2000.json \
+  --out summaries/output_modes_focused_2000_modes.md
 ```
 
 ## Notes
 
-This is an early benchmark harness, not a final leaderboard. The first suite is deliberately small so that model behavior, cost, and latency can be inspected quickly. The next step is to scale to more datasets and larger samples.
+This is still a benchmark harness, not a final leaderboard. The current results are useful for comparing output formats and low-cost model behavior, but future runs should add stronger models, retry policies for invalid outputs, and more datasets.

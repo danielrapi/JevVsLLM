@@ -15,6 +15,7 @@ from .adapters import (
     MajorityAdapter,
     OpenAILetterAdapter,
     OpenRouterLetterAdapter,
+    OpenRouterStructuredLabelAdapter,
     PredictionsFileAdapter,
     SentimentLexiconAdapter,
 )
@@ -22,7 +23,15 @@ from .datasets import (
     download_20newsgroups,
     download_ag_news,
     download_arc_challenge,
+    download_arc_challenge_combined,
     download_boolq,
+    download_commonsenseqa,
+    download_banking77,
+    download_focused_suite,
+    download_hellaswag,
+    download_large_hard_suite,
+    download_mmlu,
+    download_race,
     download_sst2,
     download_starter_suite,
     download_trec,
@@ -45,7 +54,8 @@ def run(
         typer.Option(
             help=(
                 "Adapter: majority, sentiment-lexicon, jev-api, jev-openrouter, "
-                "openai-letter, openrouter-letter, predictions-file, or command."
+                "openai-letter, openrouter-letter, openrouter-structured-label, "
+                "predictions-file, or command."
             )
         ),
     ],
@@ -178,7 +188,15 @@ def run_suite(
         int | None,
         typer.Option(help="Optional maximum number of datasets to run."),
     ] = None,
+    limit_examples: Annotated[
+        int | None,
+        typer.Option(help="Optional maximum number of examples per dataset."),
+    ] = None,
     concurrency: Annotated[int, typer.Option(help="Concurrent examples per model.")] = 4,
+    skip_existing: Annotated[
+        bool,
+        typer.Option(help="Reuse existing prediction files instead of rerunning them."),
+    ] = False,
 ) -> None:
     load_dotenv()
     model_config = read_manifest(models_manifest)
@@ -201,12 +219,32 @@ def run_suite(
         dataset_path = Path(dataset_entry["path"])
         typer.echo(f"Dataset {dataset_label}: {dataset_path}")
         examples = read_examples(dataset_path)
+        if limit_examples is not None:
+            examples = examples[:limit_examples]
         dataset_out_dir = out_dir / safe_name(dataset_label)
         dataset_out_dir.mkdir(parents=True, exist_ok=True)
 
         for model_entry in models:
             label = model_entry["label"]
             typer.echo(f"Running {dataset_label} / {label} ({model_entry['model']})...")
+            run_path = dataset_out_dir / run_file_name(label)
+            if skip_existing and run_path.exists():
+                typer.echo(f"Skipping existing {dataset_label} / {label}: {run_path}")
+                results = read_predictions(run_path)
+                summary = summarize(results)
+                combined.append(
+                    {
+                        "dataset": dataset_label,
+                        "dataset_path": str(dataset_path),
+                        "label": label,
+                        "adapter": model_entry["adapter"],
+                        "model": model_entry["model"],
+                        "run_path": str(run_path),
+                        "summary": asdict(summary),
+                    }
+                )
+                _print_summary(summary)
+                continue
             selected = _build_adapter(
                 model_entry["adapter"],
                 model=model_entry["model"],
@@ -218,7 +256,6 @@ def run_suite(
                 command=None,
             )
             results = _predict_all(selected, examples, concurrency=concurrency)
-            run_path = dataset_out_dir / run_file_name(label)
             write_predictions(run_path, results)
             summary = summarize(results)
             combined.append(
@@ -326,6 +363,62 @@ def summarize_run(
         typer.echo(f"Wrote summary metrics to {out}")
 
 
+@app.command("compare-output-modes")
+def compare_output_modes(
+    summary: Annotated[Path, typer.Argument(help="Suite summary JSON from run-suite.")],
+    out: Annotated[
+        Path | None,
+        typer.Option(help="Optional markdown table path for output-mode comparison."),
+    ] = None,
+) -> None:
+    rows = json.loads(summary.read_text(encoding="utf-8"))
+    paired: dict[tuple[str, str], dict[str, dict]] = {}
+    for row in rows:
+        base, mode = _split_output_mode_label(row["label"])
+        if mode is None:
+            continue
+        paired.setdefault((row["dataset"], base), {})[mode] = row
+
+    comparisons = []
+    for (dataset, base), modes in sorted(paired.items()):
+        if "letter" not in modes or "structured" not in modes:
+            continue
+        letter = modes["letter"]["summary"]
+        structured = modes["structured"]["summary"]
+        letter_cost = letter.get("cost_per_1k_usd")
+        structured_cost = structured.get("cost_per_1k_usd")
+        comparisons.append(
+            {
+                "dataset": dataset,
+                "model": base,
+                "letter_accuracy": letter["accuracy"],
+                "structured_accuracy": structured["accuracy"],
+                "accuracy_delta": structured["accuracy"] - letter["accuracy"],
+                "letter_p50_ms": letter["median_latency_ms"],
+                "structured_p50_ms": structured["median_latency_ms"],
+                "latency_multiplier": _safe_ratio(
+                    structured["median_latency_ms"], letter["median_latency_ms"]
+                ),
+                "letter_cost_per_1k_usd": letter_cost,
+                "structured_cost_per_1k_usd": structured_cost,
+                "cost_multiplier": _safe_ratio(structured_cost, letter_cost),
+                "letter_output_tokens": letter.get("mean_output_tokens"),
+                "structured_output_tokens": structured.get("mean_output_tokens"),
+                "output_token_multiplier": _safe_ratio(
+                    structured.get("mean_output_tokens"), letter.get("mean_output_tokens")
+                ),
+            }
+        )
+
+    aggregate = _aggregate_output_mode_comparisons(comparisons)
+    markdown = _render_output_mode_markdown(aggregate)
+    typer.echo(markdown)
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(markdown + "\n", encoding="utf-8")
+        typer.echo(f"Wrote output-mode comparison to {out}")
+
+
 @datasets_app.command("sst2")
 def datasets_sst2(
     out: Annotated[
@@ -347,9 +440,10 @@ def datasets_ag_news(
     out: Annotated[Path, typer.Option(help="Where to write AG News JSONL.")] = Path(
         "data/ag_news_test_100.jsonl"
     ),
+    split: Annotated[str, typer.Option(help="AG News split: train or test.")] = "test",
     limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 100,
 ) -> None:
-    count = download_ag_news(out, limit=limit)
+    count = download_ag_news(out, split=split, limit=limit)
     typer.echo(f"Wrote {count} AG News examples to {out}")
 
 
@@ -358,9 +452,10 @@ def datasets_trec(
     out: Annotated[Path, typer.Option(help="Where to write TREC JSONL.")] = Path(
         "data/trec_test_100.jsonl"
     ),
+    split: Annotated[str, typer.Option(help="TREC split: train or test.")] = "test",
     limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 100,
 ) -> None:
-    count = download_trec(out, limit=limit)
+    count = download_trec(out, split=split, limit=limit)
     typer.echo(f"Wrote {count} TREC examples to {out}")
 
 
@@ -369,9 +464,10 @@ def datasets_boolq(
     out: Annotated[Path, typer.Option(help="Where to write BoolQ JSONL.")] = Path(
         "data/boolq_val_100.jsonl"
     ),
+    split: Annotated[str, typer.Option(help="BoolQ split: train or val.")] = "val",
     limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 100,
 ) -> None:
-    count = download_boolq(out, limit=limit)
+    count = download_boolq(out, split=split, limit=limit)
     typer.echo(f"Wrote {count} BoolQ examples to {out}")
 
 
@@ -387,15 +483,86 @@ def datasets_arc_challenge(
     typer.echo(f"Wrote {count} ARC-Challenge examples to {out}")
 
 
+@datasets_app.command("arc-challenge-combined")
+def datasets_arc_challenge_combined(
+    out: Annotated[Path, typer.Option(help="Where to write combined ARC-Challenge JSONL.")] = Path(
+        "data/arc_challenge_all_2000.jsonl"
+    ),
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_arc_challenge_combined(out, limit=limit)
+    typer.echo(f"Wrote {count} combined ARC-Challenge examples to {out}")
+
+
 @datasets_app.command("20-newsgroups")
 def datasets_20_newsgroups(
     out: Annotated[Path, typer.Option(help="Where to write 20 Newsgroups JSONL.")] = Path(
         "data/20_newsgroups_test_100.jsonl"
     ),
+    split: Annotated[str, typer.Option(help="20 Newsgroups split: train, test, or all.")] = "test",
     limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 100,
 ) -> None:
-    count = download_20newsgroups(out, limit=limit)
+    count = download_20newsgroups(out, split=split, limit=limit)
     typer.echo(f"Wrote {count} 20 Newsgroups examples to {out}")
+
+
+@datasets_app.command("hellaswag")
+def datasets_hellaswag(
+    out: Annotated[Path, typer.Option(help="Where to write HellaSwag JSONL.")] = Path(
+        "data/hellaswag_val_2000.jsonl"
+    ),
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_hellaswag(out, limit=limit)
+    typer.echo(f"Wrote {count} HellaSwag examples to {out}")
+
+
+@datasets_app.command("commonsenseqa")
+def datasets_commonsenseqa(
+    out: Annotated[Path, typer.Option(help="Where to write CommonsenseQA JSONL.")] = Path(
+        "data/commonsenseqa_train_2000.jsonl"
+    ),
+    split: Annotated[str, typer.Option(help="CommonsenseQA split: train or dev.")] = "train",
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_commonsenseqa(out, split=split, limit=limit)
+    typer.echo(f"Wrote {count} CommonsenseQA examples to {out}")
+
+
+@datasets_app.command("mmlu")
+def datasets_mmlu(
+    out: Annotated[Path, typer.Option(help="Where to write MMLU JSONL.")] = Path(
+        "data/mmlu_test_2000.jsonl"
+    ),
+    split: Annotated[str, typer.Option(help="MMLU split: dev, val, or test.")] = "test",
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_mmlu(out, split=split, limit=limit)
+    typer.echo(f"Wrote {count} MMLU examples to {out}")
+
+
+@datasets_app.command("race")
+def datasets_race(
+    out: Annotated[Path, typer.Option(help="Where to write RACE JSONL.")] = Path(
+        "data/race_train_2000.jsonl"
+    ),
+    split: Annotated[str, typer.Option(help="RACE split: train, dev, or test.")] = "train",
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_race(out, split=split, limit=limit)
+    typer.echo(f"Wrote {count} RACE examples to {out}")
+
+
+@datasets_app.command("banking77")
+def datasets_banking77(
+    out: Annotated[Path, typer.Option(help="Where to write BANKING77 JSONL.")] = Path(
+        "data/banking77_test_2000.jsonl"
+    ),
+    split: Annotated[str, typer.Option(help="BANKING77 split: train or test.")] = "test",
+    limit: Annotated[int | None, typer.Option(help="Maximum examples to convert.")] = 2000,
+) -> None:
+    count = download_banking77(out, split=split, limit=limit)
+    typer.echo(f"Wrote {count} BANKING77 examples to {out}")
 
 
 @datasets_app.command("starter-suite")
@@ -407,6 +574,32 @@ def datasets_starter_suite(
     limit: Annotated[int, typer.Option(help="Examples per dataset.")] = 100,
 ) -> None:
     counts = download_starter_suite(out_dir, limit=limit)
+    for name, count in counts.items():
+        typer.echo(f"{name}: {count}")
+
+
+@datasets_app.command("large-hard-suite")
+def datasets_large_hard_suite(
+    out_dir: Annotated[
+        Path,
+        typer.Option(help="Directory for converted large/hard-suite JSONL files."),
+    ] = Path("data"),
+    limit: Annotated[int, typer.Option(help="Target examples per dataset.")] = 2000,
+) -> None:
+    counts = download_large_hard_suite(out_dir, limit=limit)
+    for name, count in counts.items():
+        typer.echo(f"{name}: {count}")
+
+
+@datasets_app.command("focused-suite")
+def datasets_focused_suite(
+    out_dir: Annotated[
+        Path,
+        typer.Option(help="Directory for converted focused-suite JSONL files."),
+    ] = Path("data"),
+    limit: Annotated[int, typer.Option(help="Target examples per dataset.")] = 2000,
+) -> None:
+    counts = download_focused_suite(out_dir, limit=limit)
     for name, count in counts.items():
         typer.echo(f"{name}: {count}")
 
@@ -452,6 +645,13 @@ def _build_adapter(
         )
     if adapter == "openrouter-letter":
         return OpenRouterLetterAdapter(
+            model=model,
+            input_price_per_1m=input_price_per_1m,
+            output_price_per_1m=output_price_per_1m,
+            reasoning_enabled=None if "gemini" in model.lower() else False,
+        )
+    if adapter == "openrouter-structured-label":
+        return OpenRouterStructuredLabelAdapter(
             model=model,
             input_price_per_1m=input_price_per_1m,
             output_price_per_1m=output_price_per_1m,
@@ -547,6 +747,100 @@ def _summary_from_dict(data: dict) -> Summary:
         ece=data["ece"],
         mean_confidence=data["mean_confidence"],
     )
+
+
+def _split_output_mode_label(label: str) -> tuple[str, str | None]:
+    if label.endswith("_letter"):
+        return label.removesuffix("_letter"), "letter"
+    if label.endswith("_structured"):
+        return label.removesuffix("_structured"), "structured"
+    return label, None
+
+
+def _safe_ratio(numerator, denominator) -> float | None:
+    if numerator is None or denominator in (None, 0):
+        return None
+    return numerator / denominator
+
+
+def _aggregate_output_mode_comparisons(comparisons: list[dict]) -> list[dict]:
+    grouped: dict[str, list[dict]] = {}
+    for comparison in comparisons:
+        grouped.setdefault(comparison["model"], []).append(comparison)
+
+    aggregated = []
+    for model, rows in sorted(grouped.items()):
+        aggregated.append(
+            {
+                "model": model,
+                "datasets": len(rows),
+                "letter_accuracy": sum(row["letter_accuracy"] for row in rows) / len(rows),
+                "structured_accuracy": sum(row["structured_accuracy"] for row in rows)
+                / len(rows),
+                "accuracy_delta": sum(row["accuracy_delta"] for row in rows) / len(rows),
+                "letter_p50_ms": sum(row["letter_p50_ms"] for row in rows) / len(rows),
+                "structured_p50_ms": sum(row["structured_p50_ms"] for row in rows)
+                / len(rows),
+                "latency_multiplier": _mean_present(
+                    row["latency_multiplier"] for row in rows
+                ),
+                "letter_cost_per_1k_usd": sum(
+                    row["letter_cost_per_1k_usd"] or 0 for row in rows
+                ),
+                "structured_cost_per_1k_usd": sum(
+                    row["structured_cost_per_1k_usd"] or 0 for row in rows
+                ),
+                "cost_multiplier": _safe_ratio(
+                    sum(row["structured_cost_per_1k_usd"] or 0 for row in rows),
+                    sum(row["letter_cost_per_1k_usd"] or 0 for row in rows),
+                ),
+                "output_token_multiplier": _mean_present(
+                    row["output_token_multiplier"] for row in rows
+                ),
+            }
+        )
+    return sorted(aggregated, key=lambda row: row["structured_cost_per_1k_usd"])
+
+
+def _mean_present(values) -> float | None:
+    present = [value for value in values if value is not None]
+    if not present:
+        return None
+    return sum(present) / len(present)
+
+
+def _render_output_mode_markdown(rows: list[dict]) -> str:
+    lines = [
+        "| Model | Letter acc | Structured acc | Δ acc | Letter p50 | Structured p50 | Latency × | Letter cost / 1k | Structured cost / 1k | Cost × | Output tokens × |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    row["model"],
+                    f"{row['letter_accuracy'] * 100:.1f}%",
+                    f"{row['structured_accuracy'] * 100:.1f}%",
+                    f"{row['accuracy_delta'] * 100:+.1f} pp",
+                    f"{row['letter_p50_ms']:.0f} ms",
+                    f"{row['structured_p50_ms']:.0f} ms",
+                    _format_multiplier(row["latency_multiplier"]),
+                    f"${row['letter_cost_per_1k_usd']:.4f}",
+                    f"${row['structured_cost_per_1k_usd']:.4f}",
+                    _format_multiplier(row["cost_multiplier"]),
+                    _format_multiplier(row["output_token_multiplier"]),
+                ]
+            )
+            + " |"
+        )
+    return "\n".join(lines)
+
+
+def _format_multiplier(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:.2f}×"
 
 
 def _print_comparison(summaries: list[Summary]) -> None:

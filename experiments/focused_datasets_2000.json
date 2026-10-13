@@ -1,0 +1,36 @@
+{
+  "name": "focused_datasets_2000",
+  "purpose": "Five-dataset full run for comparing one-letter answers against structured JSON with real category labels.",
+  "models": [
+    {
+      "label": "banking77_test",
+      "path": "data/banking77_test_2000.jsonl",
+      "task_type": "fine_grained_banking_intent_classification",
+      "options": 77
+    },
+    {
+      "label": "ag_news_train",
+      "path": "data/ag_news_train_2000.jsonl",
+      "task_type": "topic_classification",
+      "options": 4
+    },
+    {
+      "label": "boolq_train",
+      "path": "data/boolq_train_2000.jsonl",
+      "task_type": "boolean_reading_comprehension",
+      "options": 2
+    },
+    {
+      "label": "arc_challenge_all",
+      "path": "data/arc_challenge_all_2000.jsonl",
+      "task_type": "science_multiple_choice",
+      "options": "3-5"
+    },
+    {
+      "label": "mmlu_test",
+      "path": "data/mmlu_test_2000.jsonl",
+      "task_type": "knowledge_multiple_choice",
+      "options": 4
+    }
+  ]
+}
