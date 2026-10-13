@@ -98,6 +98,8 @@ def run(
         input_price_per_1m=input_price_per_1m,
         output_price_per_1m=output_price_per_1m,
         reasoning_effort=reasoning_effort,
+        reasoning_enabled="auto",
+        max_output_tokens=None,
         jev_base_url=jev_base_url,
         predictions=predictions,
         command=command,
@@ -145,6 +147,8 @@ def run_manifest(
             input_price_per_1m=model_config.get("price_per_1m_input_usd"),
             output_price_per_1m=model_config.get("price_per_1m_output_usd"),
             reasoning_effort="none",
+            reasoning_enabled=model_config.get("reasoning_enabled", "auto"),
+            max_output_tokens=model_config.get("max_output_tokens"),
             jev_base_url="https://api.typesafe.ai/v1/systemone",
             predictions=None,
             command=None,
@@ -251,6 +255,8 @@ def run_suite(
                 input_price_per_1m=model_entry.get("price_per_1m_input_usd"),
                 output_price_per_1m=model_entry.get("price_per_1m_output_usd"),
                 reasoning_effort="none",
+                reasoning_enabled=model_entry.get("reasoning_enabled", "auto"),
+                max_output_tokens=model_entry.get("max_output_tokens"),
                 jev_base_url="https://api.typesafe.ai/v1/systemone",
                 predictions=None,
                 command=None,
@@ -306,6 +312,8 @@ def retry_invalid(
         input_price_per_1m=input_price_per_1m,
         output_price_per_1m=output_price_per_1m,
         reasoning_effort="none",
+        reasoning_enabled="auto",
+        max_output_tokens=None,
         jev_base_url="https://api.typesafe.ai/v1/systemone",
         predictions=None,
         command=None,
@@ -611,6 +619,8 @@ def _build_adapter(
     input_price_per_1m: float | None,
     output_price_per_1m: float | None,
     reasoning_effort: str,
+    reasoning_enabled: bool | None | str,
+    max_output_tokens: int | None,
     jev_base_url: str,
     predictions: Path | None,
     command: str | None,
@@ -644,18 +654,28 @@ def _build_adapter(
             reasoning_effort=reasoning_effort,
         )
     if adapter == "openrouter-letter":
+        if reasoning_enabled == "auto":
+            selected_reasoning_enabled = None if "gemini" in model.lower() else False
+        else:
+            selected_reasoning_enabled = reasoning_enabled
         return OpenRouterLetterAdapter(
             model=model,
             input_price_per_1m=input_price_per_1m,
             output_price_per_1m=output_price_per_1m,
-            reasoning_enabled=None if "gemini" in model.lower() else False,
+            max_output_tokens=8 if max_output_tokens is None else max_output_tokens,
+            reasoning_enabled=selected_reasoning_enabled,
         )
     if adapter == "openrouter-structured-label":
+        if reasoning_enabled == "auto":
+            selected_reasoning_enabled = None if "gemini" in model.lower() else False
+        else:
+            selected_reasoning_enabled = reasoning_enabled
         return OpenRouterStructuredLabelAdapter(
             model=model,
             input_price_per_1m=input_price_per_1m,
             output_price_per_1m=output_price_per_1m,
-            reasoning_enabled=None if "gemini" in model.lower() else False,
+            max_output_tokens=80 if max_output_tokens is None else max_output_tokens,
+            reasoning_enabled=selected_reasoning_enabled,
         )
     if adapter == "predictions-file":
         if predictions is None:

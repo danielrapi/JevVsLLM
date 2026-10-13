@@ -1,0 +1,92 @@
+{
+  "name": "good_tier_letter_only",
+  "purpose": "Letter/code-only version of the stronger OpenRouter model comparison. This tests whether better general LLMs beat Jev without paying for the structured-label JSON mode that underperformed in the cheap-tier run.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 2000,
+  "models": [
+    {
+      "label": "jev_openrouter",
+      "adapter": "jev-openrouter",
+      "model": "~typesafe/jev-latest",
+      "output_mode": "decision_api",
+      "provider_family": "TypeSafe via OpenRouter",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "openai_terra_letter",
+      "adapter": "openrouter-letter",
+      "model": "openai/gpt-5.6-terra",
+      "output_mode": "letter",
+      "provider_family": "OpenAI",
+      "category": "closed_llm_balanced",
+      "price_per_1m_input_usd": 2.0,
+      "price_per_1m_output_usd": 12.0
+    },
+    {
+      "label": "openai_sol_letter",
+      "adapter": "openrouter-letter",
+      "model": "openai/gpt-5.6-sol",
+      "output_mode": "letter",
+      "provider_family": "OpenAI",
+      "category": "closed_llm_strong",
+      "price_per_1m_input_usd": 2.0,
+      "price_per_1m_output_usd": 10.0
+    },
+    {
+      "label": "claude_sonnet_letter",
+      "adapter": "openrouter-letter",
+      "model": "anthropic/claude-sonnet-5.5",
+      "output_mode": "letter",
+      "provider_family": "Anthropic",
+      "category": "closed_llm_balanced",
+      "price_per_1m_input_usd": 2.0,
+      "price_per_1m_output_usd": 10.0,
+      "reasoning_enabled": null
+    },
+    {
+      "label": "claude_opus_letter",
+      "adapter": "openrouter-letter",
+      "model": "anthropic/claude-opus-5.5",
+      "output_mode": "letter",
+      "provider_family": "Anthropic",
+      "category": "closed_llm_strong",
+      "price_per_1m_input_usd": 4.0,
+      "price_per_1m_output_usd": 20.0,
+      "reasoning_enabled": null
+    },
+    {
+      "label": "gemini_pro_latest_letter",
+      "adapter": "openrouter-letter",
+      "model": "~google/gemini-pro-latest",
+      "output_mode": "letter",
+      "provider_family": "Google",
+      "category": "closed_llm_strong",
+      "price_per_1m_input_usd": 2.0,
+      "price_per_1m_output_usd": 12.0,
+      "reasoning_enabled": false,
+      "max_output_tokens": 32
+    },
+    {
+      "label": "deepseek_pro_latest_letter",
+      "adapter": "openrouter-letter",
+      "model": "~deepseek/deepseek-pro-latest",
+      "output_mode": "letter",
+      "provider_family": "DeepSeek",
+      "category": "open_or_openish_llm_strong",
+      "price_per_1m_input_usd": 0.21912,
+      "price_per_1m_output_usd": 0.65736
+    },
+    {
+      "label": "qwen_plus_letter",
+      "adapter": "openrouter-letter",
+      "model": "qwen/qwen3.7-plus",
+      "output_mode": "letter",
+      "provider_family": "Qwen",
+      "category": "open_or_openish_llm_balanced",
+      "price_per_1m_input_usd": 0.32,
+      "price_per_1m_output_usd": 1.28
+    }
+  ]
+}
