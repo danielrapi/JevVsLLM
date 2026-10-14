@@ -1,0 +1,78 @@
+{
+  "name": "tiny_tier_letter_only",
+  "purpose": "Letter/code-only run for explicit small-parameter OpenRouter models, roughly 1B to 7B parameters, compared against Jev.",
+  "routing": "openrouter_only",
+  "dataset_limit_recommendation": 2000,
+  "models": [
+    {
+      "label": "jev_openrouter",
+      "adapter": "jev-openrouter",
+      "model": "~typesafe/jev-latest",
+      "output_mode": "decision_api",
+      "provider_family": "TypeSafe via OpenRouter",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "qwen_2_5_7b_letter",
+      "adapter": "openrouter-letter",
+      "model": "qwen/qwen-2.5-7b-instruct",
+      "output_mode": "letter",
+      "provider_family": "Qwen",
+      "category": "open_weight_7b",
+      "price_per_1m_input_usd": 0.1,
+      "price_per_1m_output_usd": 0.2
+    },
+    {
+      "label": "command_r7b_letter",
+      "adapter": "openrouter-letter",
+      "model": "cohere/command-r7b-12-2024",
+      "output_mode": "letter",
+      "provider_family": "Cohere",
+      "category": "open_weight_7b",
+      "price_per_1m_input_usd": 0.0375,
+      "price_per_1m_output_usd": 0.15
+    },
+    {
+      "label": "gemma_3_4b_letter",
+      "adapter": "openrouter-letter",
+      "model": "google/gemma-3-4b-it",
+      "output_mode": "letter",
+      "provider_family": "Google Gemma",
+      "category": "open_weight_4b",
+      "price_per_1m_input_usd": 0.05,
+      "price_per_1m_output_usd": 0.1
+    },
+    {
+      "label": "ministral_3b_letter",
+      "adapter": "openrouter-letter",
+      "model": "mistralai/ministral-3b-2512",
+      "output_mode": "letter",
+      "provider_family": "Mistral",
+      "category": "open_weight_3b",
+      "price_per_1m_input_usd": 0.1,
+      "price_per_1m_output_usd": 0.1
+    },
+    {
+      "label": "llama_3_2_3b_letter",
+      "adapter": "openrouter-letter",
+      "model": "meta-llama/llama-3.2-3b-instruct",
+      "output_mode": "letter",
+      "provider_family": "Meta Llama",
+      "category": "open_weight_3b",
+      "price_per_1m_input_usd": 0.05,
+      "price_per_1m_output_usd": 0.33
+    },
+    {
+      "label": "llama_3_2_1b_letter",
+      "adapter": "openrouter-letter",
+      "model": "meta-llama/llama-3.2-1b-instruct",
+      "output_mode": "letter",
+      "provider_family": "Meta Llama",
+      "category": "open_weight_1b",
+      "price_per_1m_input_usd": 0.027,
+      "price_per_1m_output_usd": 0.201
+    }
+  ]
+}

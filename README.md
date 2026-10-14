@@ -1,21 +1,21 @@
-# Jev vs. LLMs for Classification
+# Jev vs. LLMs and Decision Models for Classification
 
-This repo benchmarks Jev against low-cost LLMs on language classification tasks.
+This repo benchmarks Jev against low-cost LLMs and other OpenRouter decision models on language classification tasks.
 
 The core question:
 
-> For classification, can general-purpose LLMs match a decision model like Jev on accuracy, latency, and cost?
+> For classification, can general-purpose LLMs or dedicated decision models match Jev on accuracy, latency, and cost?
 
 All model calls in the main experiment run through OpenRouter. Each task is converted into a common multiple-choice format. Chat models are tested in two output modes:
 
 - **Letter/code mode:** append the answer options and ask the model to return only the selected code, such as `A` or `3`.
 - **Structured-label mode:** ask the model to return JSON containing the real category name, such as `{ "answer": "business" }`.
 
-Jev is evaluated through OpenRouter’s Decisions API.
+Jev and the other decision-model baselines are evaluated through OpenRouter’s Decisions API.
 
 ## Headline result
 
-Main run: 5 datasets × 2,000 examples each, for 130,000 total decisions.
+The first main run compares Jev against general-purpose LLMs. It uses 5 datasets × 2,000 examples each, for 130,000 total decisions.
 
 | Configuration | Accuracy | Cost | p50 latency |
 |---|---:|---:|---:|
@@ -37,6 +37,39 @@ Main takeaways:
 - Llama Scout was not reliable in this prompt/setup: many invalid outputs and very high tail latency.
 
 Output/API failures are counted as incorrect in accuracy. In this run they mostly meant either upstream OpenRouter/provider rate limits, especially for Llama Scout, or a model ignoring the requested response schema and returning reasoning text instead of the answer.
+
+## Decision-model comparison
+
+The final run compares dedicated decision models through OpenRouter’s Decisions API on the same 5 datasets × 2,000 examples setup.
+
+| Configuration | Accuracy | Cost | p50 latency |
+|---|---:|---:|---:|
+| Clef Flash | 92.0% | $0.11 | 372 ms |
+| Mercury Decide free | 90.2% | $0.00 | 504 ms |
+| Perplexity Decider | 89.5% | $0.07 | 311 ms |
+| Jev | 89.0% | $0.27 | 272 ms |
+| Microsoft Decision 1 | 87.5% | $0.10 | 314 ms |
+| Drex v1.5 | 86.8% | $0.09 | 274 ms |
+| OpenAI Luna Decisions | 86.1% | $0.34 | 292 ms |
+
+Main takeaways:
+
+- Dedicated decision models are much stronger than generic chat LLMs for this benchmark.
+- Clef Flash is the aggregate winner, driven by very strong Banking77 and ARC results.
+- Jev remains the best on MMLU and is still the fastest model in the top accuracy cluster.
+- Perplexity Decider is the strongest cheap paid route: it beats Jev overall in this run while costing much less.
+- Microsoft Decision 1 is strong on Banking77 and BoolQ, but weaker on MMLU.
+- Mercury Decide free is surprisingly competitive, though slower and weaker on MMLU.
+
+Per-dataset decision-model winners:
+
+| Dataset | Winner | Accuracy |
+|---|---|---:|
+| Banking77 | Clef Flash | 94.5% |
+| AG News | Mercury Decide free | 87.9% |
+| BoolQ | Perplexity Decider | 94.5% |
+| ARC Challenge | Clef Flash | 98.8% |
+| MMLU | Jev | 93.1% |
 
 ## Accuracy breakdown
 
@@ -68,6 +101,8 @@ Full report:
 
 - [Full per-dataset report](results/output_modes_focused_2000.md)
 - [Good-tier letter-only report](results/good_tier_core_no_terra_letter_2000.md)
+- [Tiny-tier letter-only report](results/tiny_tier_letter_2000.md)
+- [OpenRouter decision-model report](results/decision_models_openrouter_2000.md)
 - [Raw combined JSON summary](summaries/output_modes_focused_2000.json)
 - [Letter-vs-structured comparison table](summaries/output_modes_focused_2000_modes.md)
 

@@ -1,0 +1,78 @@
+{
+  "name": "decision_models_openrouter",
+  "purpose": "Decision-model-only comparison through OpenRouter's Decisions API.",
+  "routing": "openrouter_decisions_only",
+  "dataset_limit_recommendation": 2000,
+  "models": [
+    {
+      "label": "jev_latest_decision",
+      "adapter": "jev-openrouter",
+      "model": "~typesafe/jev-latest",
+      "output_mode": "decision_api",
+      "provider_family": "TypeSafe",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "openai_luna_decisions",
+      "adapter": "jev-openrouter",
+      "model": "openai/gpt-6-luna-decisions",
+      "output_mode": "decision_api",
+      "provider_family": "OpenAI",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.1,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "microsoft_decision_1",
+      "adapter": "jev-openrouter",
+      "model": "microsoft/microsoft-decision-1",
+      "output_mode": "decision_api",
+      "provider_family": "Microsoft",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.042,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "perplexity_decider_v1_1_27b",
+      "adapter": "jev-openrouter",
+      "model": "perplexity/pplx-decider-v1.1-27b",
+      "output_mode": "decision_api",
+      "provider_family": "Perplexity",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.02,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "drex_v1_5",
+      "adapter": "jev-openrouter",
+      "model": "nace-ai/drex-v1.5",
+      "output_mode": "decision_api",
+      "provider_family": "Nace.AI",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.04,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "clef_flash",
+      "adapter": "jev-openrouter",
+      "model": "cloudflare/clef-flash",
+      "output_mode": "decision_api",
+      "provider_family": "Cloudflare",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.021,
+      "price_per_1m_output_usd": 0.0
+    },
+    {
+      "label": "mercury_decide_free",
+      "adapter": "jev-openrouter",
+      "model": "inception/mercury-decide:free",
+      "output_mode": "decision_api",
+      "provider_family": "Inception",
+      "category": "decision_model",
+      "price_per_1m_input_usd": 0.0,
+      "price_per_1m_output_usd": 0.0
+    }
+  ]
+}

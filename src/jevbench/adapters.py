@@ -312,7 +312,7 @@ class JevOpenRouterAdapter(JevAPIAdapter):
             input_tokens = usage.get("input_tokens") or usage.get("prompt_tokens")
             output_tokens = usage.get("output_tokens") or usage.get("completion_tokens")
             cost = (
-                _estimate_cost(input_tokens, output_tokens, self.input_price_per_1m, 0.0)
+                _estimate_cost(input_tokens, output_tokens or 0, self.input_price_per_1m, 0.0)
                 if input_tokens is not None
                 else usage.get("cost")
             )
